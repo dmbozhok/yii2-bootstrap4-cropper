@@ -7,7 +7,6 @@
  * @since       19.12.18
  */
 
-use yii\bootstrap4\Modal;
 use yii\helpers\Html;
 
 /**
@@ -40,71 +39,40 @@ echo Html::activeHiddenInput($model, $attribute);
                     ]
                 ) ?>
             </div>
-            <div class="cropper-preview-buttons">
+            <div class="cropper-preview-picture d-none">
                 <?php
-                echo Html::button(
-                    $extensionOptions['changeButtonText'],
+                echo Html::tag(
+                    'div',
+                    Html::img('#', [
+                        'id' => $imageId,
+                        'class' => 'sabirov-cropper-image',
+                        'alt' => 'Upload a picture',
+                    ])
+                );
+
+                echo Html::tag(
+                    'div',
+                    $extensionOptions['cropperWarningText'],
                     [
-                        'class' => 'btn btn-primary',
-                        'type' => 'button',
-                        'data-toggle' => 'modal',
-                        'data-target' => '#' . $modalId
+                        'class' => 'alert alert-warning cropper-warning'
                     ]
                 );
                 ?>
             </div>
+            <div class="cropper-preview-buttons">
+                <div class="input-group cropper-browse-group">
+                    <span class="input-group-btn cropper-input-group-btn">
+                        <label for="<?= $inputImageId ?>" class="btn btn-primary btn-file">
+                            <?= $extensionOptions['browseButtonText'] ?>
+                        </label>
+                        <input type="file" id="<?= $inputImageId ?>" class="d-none">
+                        <input type="hidden" name="LawyersPhoto[crop_info]" value="" id="LawyersPhoto__crop_info">
+                    </span>
+                </div>
+            </div>
         </div>
     </div>
 <?php
-Modal::begin([
-    'id' => $modalId,
-    'class' => 'modal fade',
-    'title' => 'Cropping the Image',
-    'footer' => Html::button(
-            $extensionOptions['cropButtonText'],
-            [
-                'id' => $cropButtonId,
-                'class' => 'btn btn-primary'
-            ]
-        ) .
-        Html::button(
-            $extensionOptions['closeButtonText'],
-            [
-                'class' => 'btn btn-secondary',
-                'data-dismiss' => 'modal'
-            ]
-        )
-    ,
-    'size' => Modal::SIZE_LARGE
-]);
-?>
-    <div class="input-group cropper-browse-group">
-            <span class="input-group-btn cropper-input-group-btn">
-                <span class="btn btn-primary btn-file">
-                    <?= $extensionOptions['browseButtonText'] ?> <input type="file" id="<?= $inputImageId ?>">
-                </span>
-            </span>
-        <input type="text" class="form-control" disabled="disabled">
-    </div>
-<?php
-echo Html::tag(
-    'div',
-    Html::img('#', [
-        'id' => $imageId,
-        'class' => 'sabirov-cropper-image',
-        'alt' => 'Upload a picture',
-    ])
-);
-
-echo Html::tag(
-    'div',
-    $extensionOptions['cropperWarningText'],
-    [
-        'class' => 'alert alert-warning cropper-warning'
-    ]
-);
-
-Modal::end();
 
 /* add java script */
 $js = <<<JS
@@ -119,22 +87,6 @@ $js = <<<JS
     const previewImageId = '#' + '$previewImageId';
     const thisId = '#'+'$thisId';
 
-    $(document).on('change', inputImageId, function () {
-        const input = $(this);
-        let label = input.val().replace(/^.*[\\\/]/, '');
-        input.trigger('fileselect', [label]);
-    });
-
-    $(inputImageId).on('fileselect', function (event, label) {
-        let input = $(this).parents('.input-group').find(':text');
-
-        if (input.length) {
-            input.val(label);
-        } else {
-            if (label) alert(label);
-        }
-    });
-
     $(inputImageId).on('change', function () {
         readURL(this);
     });
@@ -145,7 +97,6 @@ $js = <<<JS
         }
 
         $(imageId).attr('src', null);
-        $(modalId + ' .cropper-browse-group .form-control').val(null);
         $('.cropper-warning').hide();
     });
 
@@ -169,17 +120,6 @@ $js = <<<JS
 
         const image = $(imageId)[0];
 
-        /* add Cropper events*/
-        /*image.addEventListener('crop', (event) => {
-            console.log(event.detail.x);
-            console.log(event.detail.y);
-            console.log(event.detail.width);
-            console.log(event.detail.height);
-            console.log(event.detail.rotate);
-            console.log(event.detail.scaleX);
-            console.log(event.detail.scaleY);
-        });*/
-
         /* initialize Cropper */
         cropper = new Cropper(
             image,
@@ -187,11 +127,14 @@ $js = <<<JS
         );
 
         $('.cropper-warning').show();
+        $('.cropper-preview-picture').removeClass('d-none');
+        $('.cropper-preview-img').addClass('d-none');
 
-        /* On crop button click */
-        $(cropButtonId).on('click', function () {
+        /* perform crop for submiting form */
+        window.lawyerCroperFinish = function () {
             const imgUrl = cropper.getCroppedCanvas().toDataURL();
             $(previewImageId).attr('src', imgUrl);
+            $('input#LawyersPhoto__crop_info').val(JSON.stringify(cropper.getData()));
 
             cropper.getCroppedCanvas().toBlob((blob) => {
                 let reader = new FileReader();
@@ -199,14 +142,11 @@ $js = <<<JS
                 reader.onloadend = function () {
                     const base64data = reader.result;
                     $(thisId).val(base64data);
-
-                    $(modalId).modal('hide');
                 }
             });
-        });
+        };
     }
 })(jQuery);
 JS;
 
 Yii::$app->view->registerJs($js, $this::POS_LOAD, 'sabirov-cropper-' . $thisId);
-

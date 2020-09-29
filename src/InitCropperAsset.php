@@ -7,7 +7,7 @@
  * @since       19.12.18
  */
 
-namespace sabirov\cropper;
+namespace dmbozhok\cropper;
 
 use yii\web\AssetBundle;
 
@@ -19,7 +19,7 @@ class InitCropperAsset extends AssetBundle
     ];
     public $js = [];
     public $depends = [
-        'sabirov\cropper\CropperAsset',
+        'dmbozhok\cropper\CropperAsset',
         'yii\web\JqueryAsset'
     ];
 }

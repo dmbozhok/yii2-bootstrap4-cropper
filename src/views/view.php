@@ -59,21 +59,26 @@ echo Html::activeHiddenInput($model, $attribute);
                 );
                 ?>
             </div>
-            <div class="cropper-preview-buttons">
-                <div class="input-group cropper-browse-group">
-                    <span class="input-group-btn cropper-input-group-btn">
-                        <label for="<?= $inputImageId ?>" class="btn btn-primary btn-file">
-                            <?= $extensionOptions['browseButtonText'] ?>
-                        </label>
-                        <input type="file" id="<?= $inputImageId ?>" class="d-none">
-                        <input type="hidden" name="LawyersPhoto[crop_info]" value="" id="LawyersPhoto__crop_info">
-                    </span>
-                </div>
+
+            <div class="form-group cropper-preview-buttons validating">
+                <label for="<?= $inputImageId ?>"><span><?= $extensionOptions['browseButtonText'] ?></span></label>
+                <input type="file" id="<?= $inputImageId ?>" class="form-control-file is-valid d-none" name="LawyersPhoto[imageFile]" accept="image/jpeg,image/jpg" aria-invalid="false">
+                <input type="hidden" name="LawyersPhoto[crop_info]" value="" id="LawyersPhoto__crop_info">
+                <div class="invalid-feedback"></div>
             </div>
         </div>
     </div>
 <?php
-
+if($extensionOptions['saveButtonId']) {
+    $saveButtonId = '#' . $extensionOptions['saveButtonId'];
+} else {
+    $saveButtonId = '';
+}
+if($extensionOptions['modalId']) {
+    $modalId = '#' . $extensionOptions['modalId'];
+} else {
+    $modalId = '';
+}
 /* add java script */
 $js = <<<JS
 (function ($) {
@@ -81,11 +86,12 @@ $js = <<<JS
     const cropperOptions = '$cropperOptions';
     const cropperOptionsObj = JSON.parse(cropperOptions);
     const inputImageId = '#'+'$inputImageId';
-    const modalId = '#' + '$modalId';
+    const modalId = '$modalId';
     const imageId = '#'+'$imageId';
     const cropButtonId = '#'+'$cropButtonId';
     const previewImageId = '#' + '$previewImageId';
     const thisId = '#'+'$thisId';
+    const saveButtonId = '$saveButtonId';
 
     $(inputImageId).on('change', function () {
         readURL(this);
@@ -98,6 +104,9 @@ $js = <<<JS
 
         $(imageId).attr('src', null);
         $('.cropper-warning').hide();
+        if(saveButtonId) {
+            $(saveButtonId).attr('disabled','disabled');
+        }
     });
 
     const readURL = function (input) {
@@ -110,6 +119,9 @@ $js = <<<JS
             };
 
             reader.readAsDataURL(input.files[0]);
+        }
+        if(saveButtonId) {
+            $(saveButtonId).attr('disabled',false);
         }
     };
 

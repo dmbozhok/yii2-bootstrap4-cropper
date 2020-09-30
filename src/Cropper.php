@@ -160,6 +160,19 @@ class Cropper extends InputWidget
             $adjustedOptions['cropperWarningText'] = 'Double-click to switch between moving the image and selecting the cropping area.';
         }
 
+        /* saveButtonId to control it*/
+        if (isset($options['saveButtonId']) && !empty($options['saveButtonId'])) {
+            $adjustedOptions['saveButtonId'] = trim($options['saveButtonId']);
+        } else {
+            $adjustedOptions['saveButtonId'] = '';
+        }
+
+        /* modalId to control it*/
+        if (isset($options['modalId']) && !empty($options['modalId'])) {
+            $adjustedOptions['modalId'] = trim($options['modalId']);
+        } else {
+            $adjustedOptions['modalId'] = '';
+        }
 
         $this->extensionOptions = $adjustedOptions;
     }

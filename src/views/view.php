@@ -104,6 +104,10 @@ $js = <<<JS
 
         $(imageId).attr('src', null);
         $('.cropper-warning').hide();
+        
+        $('.cropper-preview-picture').addClass('d-none');
+        $('.cropper-preview-img').removeClass('d-none');
+        
         if(saveButtonId) {
             $(saveButtonId).attr('disabled','disabled');
         }

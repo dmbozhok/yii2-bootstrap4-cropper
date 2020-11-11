@@ -161,6 +161,10 @@ $js = <<<JS
                 }
             });
         };
+        
+        window.lawyerCroperFinishDataURL = function() {
+            return cropper.getCroppedCanvas().toDataURL();
+        };
     }
 })(jQuery);
 JS;

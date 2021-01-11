@@ -62,7 +62,7 @@ echo Html::activeHiddenInput($model, $attribute);
 
             <div class="form-group cropper-preview-buttons validating">
                 <label for="<?= $inputImageId ?>"><span><?= $extensionOptions['browseButtonText'] ?></span></label>
-                <input type="file" id="<?= $inputImageId ?>" class="form-control-file is-valid d-none" name="LawyersPhoto[imageFile]" accept="image/jpeg,image/jpg" aria-invalid="false">
+                <input type="file" id="<?= $inputImageId ?>" class="form-control-file is-valid d-none" name="LawyersPhoto[imageFile]" accept="image/jpeg,image/jpg,image/png" aria-invalid="false">
                 <input type="hidden" name="LawyersPhoto[crop_info]" value="" id="LawyersPhoto__crop_info">
                 <div class="invalid-feedback"></div>
             </div>
